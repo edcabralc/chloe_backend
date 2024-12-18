@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+  USER
+}
+
+enum ReservationStatus {
+  PENDING
+  CANCEL
+  RESERVED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  password     String
+  role         Role      @default(USER)
+  status       Boolean   @default(true)
+  imageProfile String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+  Address      Address[]
+  Book         Book[]
+
+  @@map("users")
+}
+
+model Address {
+  id          String @id @default(uuid())
+  cep         String
+  logradouro  String
+  numero      String
+  complemento String
+  bairro      String
+  cidade      String
+  estado      String
+  pais        String
+  userId      String
+  user        User?  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("adresses")
+}
+
+model Book {
+  id               String   @id @default(uuid())
+  qtdPeople        Int      @default(0)
+  checkIn          DateTime
+  checkOut         DateTime
+  cupom            String
+  total            Int      @default(0)
+  totalDescount    Int      @default(0)
+  confirmation     Boolean  @default(false)
+  dateConfirmation DateTime
+  serviceId        String
+  services         Service? @relation(fields: [serviceId], references: [id])
+  userId           String
+  user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("books")
+}
+
+model Feedback {
+  id        String  @id @default(uuid())
+  pontuacao Int
+  descricao String
+  status    Boolean
+
+  @@map("feedbacks")
+}
+
+model Room {
+  id          String            @id @default(uuid())
+  name        String
+  type        String
+  status      ReservationStatus @default(PENDING)
+  description String
+  price       Int
+  images      String
+
+  @@map("rooms")
+}
+
+model Service {
+  id         String @id @default(uuid())
+  Cofre      Int?
+  Lavanderia Int?
+  Cafe       Int?
+  Massagem   Int?
+  Frigobar   Int?
+  Transfer   Int?
+  Book       Book[]
+
+  @@map("services")
+}
