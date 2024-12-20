@@ -52,19 +52,21 @@ model Address {
 }
 
 model Book {
-  id               String   @id @default(uuid())
-  qtdPeople        Int      @default(0)
+  id               String    @id @default(uuid())
+  qtdPeople        Int       @default(0)
   checkIn          DateTime
   checkOut         DateTime
-  cupom            String
-  total            Int      @default(0)
-  totalDescount    Int      @default(0)
-  confirmation     Boolean  @default(false)
-  dateConfirmation DateTime
-  serviceId        String
-  services         Service? @relation(fields: [serviceId], references: [id])
+  cupom            String?
+  total            Int       @default(0)
+  totalDescount    Int       @default(0)
+  confirmation     Boolean   @default(false)
+  dateConfirmation DateTime?
+  serviceId        String?
+  roomId           String
+  room             Room?     @relation(fields: [roomId], references: [id])
+  services         Service?  @relation(fields: [serviceId], references: [id])
   userId           String
-  user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user             User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("books")
 }
@@ -81,11 +83,12 @@ model Feedback {
 model Room {
   id          String            @id @default(uuid())
   name        String
-  type        String
-  status      ReservationStatus @default(PENDING)
   description String
+  type        String
   price       Int
-  images      String
+  images      String?
+  status      ReservationStatus @default(PENDING)
+  Book        Book[]
 
   @@map("rooms")
 }

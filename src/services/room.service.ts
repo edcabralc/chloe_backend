@@ -1,7 +1,7 @@
 import { prisma } from "@/libs/prisma";
 import { Prisma } from "@prisma/client";
 
-const bookService = {
+const roomService = {
   get: async () => {
     const users = await prisma.book.findMany({
       select: {
@@ -21,7 +21,7 @@ const bookService = {
     return user;
   },
 
-  create: async (payload: Prisma.BookCreateInput) => {
+  create: async (payload: Prisma.RoomCreateInput) => {
     const newUser = await prisma.book.create({
       data: { ...payload },
       select: {
@@ -50,4 +50,4 @@ const bookService = {
   },
 };
 
-export { bookService };
+export { roomService };

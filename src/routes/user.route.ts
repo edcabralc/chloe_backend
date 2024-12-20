@@ -4,6 +4,7 @@ import { Router } from "express";
 const userRoutes = Router();
 
 userRoutes.get("/", userController.get);
+userRoutes.get("/:id", userController.getById);
 userRoutes.post("/", userController.create);
 userRoutes.patch("/:id", userController.update);
 userRoutes.delete("/:id", userController.delete);
