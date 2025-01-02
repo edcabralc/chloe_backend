@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { userRoutes } from "./user.route";
+
+import { reservationRoutes } from "@/routes/reservation.route";
+import { userRoutes } from "@/routes/user.route";
 
 const mainRoutes = Router();
 
 mainRoutes.use("/users", userRoutes);
-mainRoutes.use("/books", userRoutes);
+mainRoutes.use("/reservations", reservationRoutes);
 
 export { mainRoutes };

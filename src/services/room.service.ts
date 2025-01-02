@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 
 const roomService = {
   get: async () => {
-    const users = await prisma.book.findMany({
+    const users = await prisma.room.findMany({
       select: {
         id: true,
       },
@@ -13,7 +13,7 @@ const roomService = {
   },
 
   getbyId: async (id: string) => {
-    const user = await prisma.book.findUnique({
+    const user = await prisma.room.findUnique({
       where: { id },
       select: {},
     });
@@ -22,7 +22,7 @@ const roomService = {
   },
 
   create: async (payload: Prisma.RoomCreateInput) => {
-    const newUser = await prisma.book.create({
+    const newUser = await prisma.room.create({
       data: { ...payload },
       select: {
         id: true,
@@ -32,8 +32,8 @@ const roomService = {
     return newUser;
   },
 
-  update: async (id: string, payload: Prisma.UserUpdateInput) => {
-    const user = await prisma.book.update({
+  update: async (id: string, payload: Prisma.RoomUpdateInput) => {
+    const user = await prisma.room.update({
       where: { id },
       data: { ...payload },
       select: {
@@ -45,7 +45,7 @@ const roomService = {
   },
 
   delete: async (id: string) => {
-    await prisma.book.delete({ where: { id } });
+    await prisma.room.delete({ where: { id } });
     return true;
   },
 };

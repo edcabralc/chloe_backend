@@ -10,7 +10,7 @@ datasource db {
 enum Role {
   ADMIN
   EMPLOYEE
-  USER
+  GUEST
 }
 
 enum ReservationStatus {
@@ -20,17 +20,17 @@ enum ReservationStatus {
 }
 
 model User {
-  id           String    @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
-  email        String    @unique
+  email        String        @unique
   password     String
-  role         Role      @default(USER)
-  status       Boolean   @default(true)
+  role         Role          @default(GUEST)
+  status       Boolean       @default(true)
   imageProfile String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @default(now()) @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
   Address      Address[]
-  Book         Book[]
+  reservations Reservation[]
 
   @@map("users")
 }
@@ -51,9 +51,35 @@ model Address {
   @@map("adresses")
 }
 
-model Book {
+model Room {
+  id           String            @id @default(uuid())
+  name         String
+  description  String
+  type         String
+  price        Int
+  images       String?
+  status       ReservationStatus @default(PENDING)
+  reservations Reservation[]
+
+  @@map("rooms")
+}
+
+model Service {
+  id           String        @id @default(uuid())
+  Cofre        Int?
+  Lavanderia   Int?
+  Cafe         Int?
+  Massagem     Int?
+  Frigobar     Int?
+  Transfer     Int?
+  reservations Reservation[]
+
+  @@map("services")
+}
+
+model Reservation {
   id               String    @id @default(uuid())
-  qtdPeople        Int       @default(0)
+  peoples          Int       @default(0)
   checkIn          DateTime
   checkOut         DateTime
   cupom            String?
@@ -63,12 +89,13 @@ model Book {
   dateConfirmation DateTime?
   serviceId        String?
   roomId           String
-  room             Room?     @relation(fields: [roomId], references: [id])
-  services         Service?  @relation(fields: [serviceId], references: [id])
   userId           String
   user             User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  room             Room?     @relation(fields: [roomId], references: [id])
+  services         Service?  @relation(fields: [serviceId], references: [id])
 
-  @@map("books")
+  @@unique([userId, roomId, checkIn])
+  @@map("reservations")
 }
 
 model Feedback {
@@ -78,30 +105,4 @@ model Feedback {
   status    Boolean
 
   @@map("feedbacks")
-}
-
-model Room {
-  id          String            @id @default(uuid())
-  name        String
-  description String
-  type        String
-  price       Int
-  images      String?
-  status      ReservationStatus @default(PENDING)
-  Book        Book[]
-
-  @@map("rooms")
-}
-
-model Service {
-  id         String @id @default(uuid())
-  Cofre      Int?
-  Lavanderia Int?
-  Cafe       Int?
-  Massagem   Int?
-  Frigobar   Int?
-  Transfer   Int?
-  Book       Book[]
-
-  @@map("services")
 }

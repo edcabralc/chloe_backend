@@ -1,9 +1,9 @@
 import { prisma } from "@/libs/prisma";
 import { Prisma } from "@prisma/client";
 
-const bookService = {
+const reservationService = {
   get: async () => {
-    const users = await prisma.book.findMany({
+    const users = await prisma.reservation.findMany({
       select: {
         id: true,
       },
@@ -13,7 +13,7 @@ const bookService = {
   },
 
   getbyId: async (id: string) => {
-    const user = await prisma.book.findUnique({
+    const user = await prisma.reservation.findUnique({
       where: { id },
       select: {},
     });
@@ -21,8 +21,8 @@ const bookService = {
     return user;
   },
 
-  create: async (payload: Prisma.BookCreateInput) => {
-    const newUser = await prisma.book.create({
+  create: async (payload: Prisma.ReservationCreateInput) => {
+    const newUser = await prisma.reservation.create({
       data: { ...payload },
       select: {
         id: true,
@@ -32,8 +32,8 @@ const bookService = {
     return newUser;
   },
 
-  update: async (id: string, payload: Prisma.UserUpdateInput) => {
-    const user = await prisma.book.update({
+  update: async (id: string, payload: Prisma.ReservationUpdateInput) => {
+    const user = await prisma.reservation.update({
       where: { id },
       data: { ...payload },
       select: {
@@ -45,9 +45,9 @@ const bookService = {
   },
 
   delete: async (id: string) => {
-    await prisma.book.delete({ where: { id } });
+    await prisma.reservation.delete({ where: { id } });
     return true;
   },
 };
 
-export { bookService };
+export { reservationService };

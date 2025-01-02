@@ -1,11 +1,11 @@
-import { bookService } from "@/services/book.service";
+import { reservationService } from "@/services/reservation.service";
 import { RequestHandler } from "express";
 
-const bookController: { [key: string]: RequestHandler } = {
+const reservationController: { [key: string]: RequestHandler } = {
   get: async (req, res) => {
-    const books = await bookService.get();
+    const reservations = await reservationService.get();
 
-    res.status(200).json(books);
+    res.status(200).json(reservations);
   },
 
   getById: async (req, res) => {
@@ -14,20 +14,20 @@ const bookController: { [key: string]: RequestHandler } = {
       return;
     }
 
-    const book = await bookService.getbyId(id);
+    const book = await reservationService.getbyId(id);
 
     res.status(200).json(book);
   },
 
   create: async (req, res) => {
-    const { qtdPeople, checkIn, checkOut, total, roomId } = req.body;
+    const { peoples, checkIn, checkOut, total, roomId } = req.body;
 
     if (!checkIn || !checkOut) {
       return;
     }
 
-    const book = await bookService.create({
-      qtdPeople,
+    const book = await reservationService.create({
+      peoples,
       checkIn,
       checkOut,
       total,
@@ -43,7 +43,7 @@ const bookController: { [key: string]: RequestHandler } = {
       return;
     }
 
-    const user = await bookService.update(id, req.body);
+    const user = await reservationService.update(id, req.body);
 
     res.status(200).json(user);
   },
@@ -55,10 +55,10 @@ const bookController: { [key: string]: RequestHandler } = {
       return;
     }
 
-    await bookService.delete(id);
+    await reservationService.delete(id);
 
     res.status(300).json({ message: "Registro removido com sucesso" });
   },
 };
 
-export { bookController };
+export { reservationController };
