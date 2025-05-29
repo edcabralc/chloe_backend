@@ -1,4 +1,5 @@
 import { reservationService } from "@/services/reservation.service";
+import { reservationValidator } from "@/validators/reservation.validator";
 import { RequestHandler } from "express";
 
 const reservationController: { [key: string]: RequestHandler } = {
@@ -20,17 +21,26 @@ const reservationController: { [key: string]: RequestHandler } = {
   },
 
   create: async (req, res) => {
-    const { peoples, checkIn, checkOut, total, roomId } = req.body;
+    const reservationParsed = reservationValidator.create(req.body);
 
-    if (!checkIn || !checkOut) {
+    if (!reservationParsed.success) {
+      res.status(400).json({
+        error: reservationParsed.error.flatten().fieldErrors,
+      });
       return;
     }
+
+    const { peoples, checkIn, checkOut, total, totalDiscount, room, user } =
+      reservationParsed.data;
 
     const book = await reservationService.create({
       peoples,
       checkIn,
       checkOut,
+      totalDiscount,
       total,
+      roomId: room.id,
+      userId: user.id,
     });
 
     res.status(201).json(book);

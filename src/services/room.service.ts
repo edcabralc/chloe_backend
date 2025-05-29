@@ -3,33 +3,40 @@ import { Prisma } from "@prisma/client";
 
 const roomService = {
   get: async () => {
-    const users = await prisma.room.findMany({
+    const rooms = await prisma.room.findMany({
       select: {
         id: true,
       },
     });
 
-    return users;
+    return rooms;
   },
 
   getbyId: async (id: string) => {
-    const user = await prisma.room.findUnique({
+    const room = await prisma.room.findUnique({
       where: { id },
       select: {},
     });
 
-    return user;
+    return room;
   },
 
   create: async (payload: Prisma.RoomCreateInput) => {
-    const newUser = await prisma.room.create({
+    const newRoom = await prisma.room.create({
       data: { ...payload },
       select: {
         id: true,
+        name: true,
+        type: true,
+        description: true,
+        price: true,
+        images: true,
+        status: true,
+        reservations: true,
       },
     });
 
-    return newUser;
+    return newRoom;
   },
 
   update: async (id: string, payload: Prisma.RoomUpdateInput) => {

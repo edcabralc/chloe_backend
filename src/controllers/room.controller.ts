@@ -1,4 +1,5 @@
 import { roomService } from "@/services/room.service";
+import { roomValidator } from "@/validators/room.validator";
 import { RequestHandler } from "express";
 
 const roomController: { [key: string]: RequestHandler } = {
@@ -20,7 +21,16 @@ const roomController: { [key: string]: RequestHandler } = {
   },
 
   create: async (req, res) => {
-    const { name, type, description, price } = req.body;
+    const roomParsed = roomValidator.create(req.body);
+
+    if (!roomParsed.success) {
+      res.status(400).json({
+        error: roomParsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const { name, type, description, price } = roomParsed.data;
 
     if (!name || !description || !price) {
       return;

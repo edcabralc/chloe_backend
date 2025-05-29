@@ -1,5 +1,6 @@
 import { prisma } from "@/libs/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const userService = {
   get: async () => {
@@ -31,9 +32,23 @@ const userService = {
     return user;
   },
 
-  create: async (payload: Prisma.UserCreateInput) => {
-    const newUser = await prisma.user.create({
-      data: { ...payload },
+  create: async ({
+    name,
+    email,
+    password,
+  }: Pick<User, "name" | "email" | "password">) => {
+    email = email.toLocaleLowerCase();
+
+    const user = await prisma.user.findFirst({ where: { email } });
+
+    if (user) {
+      return false;
+    }
+
+    const hashedPassword = bcrypt.hashSync(password);
+
+    return await prisma.user.create({
+      data: { name, email, password: hashedPassword },
       select: {
         id: true,
         name: true,
@@ -41,8 +56,6 @@ const userService = {
         status: true,
       },
     });
-
-    return newUser;
   },
 
   update: async (id: string, payload: Prisma.UserUpdateInput) => {
@@ -63,6 +76,18 @@ const userService = {
   delete: async (id: string) => {
     await prisma.user.delete({ where: { id } });
     return true;
+  },
+
+  verifyUser: async ({ email, password }: Pick<User, "email" | "password">) => {
+    const user = await prisma.user.findFirst({ where: { email } });
+
+    if (!user) {
+      return false;
+    }
+
+    if (!bcrypt.compareSync(password, user.password)) {
+      return false;
+    }
   },
 };
 

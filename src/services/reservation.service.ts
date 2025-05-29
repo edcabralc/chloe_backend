@@ -1,39 +1,57 @@
 import { prisma } from "@/libs/prisma";
+import { ReservationType } from "@/types/reservation.type";
 import { Prisma } from "@prisma/client";
 
 const reservationService = {
   get: async () => {
-    const users = await prisma.reservation.findMany({
+    const reservations = await prisma.reservation.findMany({
       select: {
         id: true,
       },
     });
 
-    return users;
+    return reservations;
   },
 
   getbyId: async (id: string) => {
-    const user = await prisma.reservation.findUnique({
+    const reservation = await prisma.reservation.findUnique({
       where: { id },
       select: {},
     });
 
-    return user;
+    return reservation;
   },
 
-  create: async (payload: Prisma.ReservationCreateInput) => {
-    const newUser = await prisma.reservation.create({
-      data: { ...payload },
+  create: async ({
+    peoples,
+    checkIn,
+    checkOut,
+    totalDiscount,
+    total,
+    roomId,
+    userId,
+  }: ReservationType) => {
+    const reservation = await prisma.reservation.create({
+      data: {
+        peoples,
+        checkIn,
+        checkOut,
+        totalDiscount,
+        total,
+        room: { connect: { id: roomId } },
+        user: { connect: { id: userId } },
+      },
+
       select: {
         id: true,
       },
     });
 
-    return newUser;
+    return reservation;
   },
 
   update: async (id: string, payload: Prisma.ReservationUpdateInput) => {
-    const user = await prisma.reservation.update({
+    const reservation = await prisma.reservation.update({
       where: { id },
       data: { ...payload },
       select: {
@@ -41,7 +59,7 @@ const reservationService = {
       },
     });
 
-    return user;
+    return reservation;
   },
 
   delete: async (id: string) => {

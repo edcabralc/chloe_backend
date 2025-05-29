@@ -1,4 +1,5 @@
 import { userService } from "@/services/user.service";
+import { userValidator } from "@/validators/user.validator";
 import { RequestHandler } from "express";
 
 const userController: { [key: string]: RequestHandler } = {
@@ -20,13 +21,21 @@ const userController: { [key: string]: RequestHandler } = {
   },
 
   create: async (req, res) => {
-    const { name, email, password } = req.body;
+    const userParsed = userValidator.create(req.body);
 
-    if (!name || !email || !password) {
+    if (!userParsed.success) {
+      res.status(400).json({ error: userParsed.error.flatten().fieldErrors });
       return;
     }
 
+    const { name, email, password } = userParsed.data;
+
     const user = await userService.create({ name, email, password });
+
+    if (!user) {
+      res.status(400).json({ error: "Erro ao criar usuário" });
+      return;
+    }
 
     res.status(201).json(user);
   },

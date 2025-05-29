@@ -19,24 +19,32 @@ enum ReservationStatus {
   RESERVED
 }
 
+enum ReservationPayment {
+  PENDING
+  PAID
+  UNPAID
+}
+
 model User {
-  id           String        @id @default(uuid())
+  id           String  @id @default(uuid())
   name         String
-  email        String        @unique
+  email        String  @unique
   password     String
-  role         Role          @default(GUEST)
-  status       Boolean       @default(true)
+  status       Boolean @default(true)
+  role         Role    @default(GUEST)
   imageProfile String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @default(now()) @updatedAt
-  Address      Address[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  address      Address[]     @relation("UserAdress")
   reservations Reservation[]
 
   @@map("users")
 }
 
 model Address {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   cep         String
   logradouro  String
   numero      String
@@ -45,57 +53,84 @@ model Address {
   cidade      String
   estado      String
   pais        String
-  userId      String
-  user        User?  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation("UserAdress", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("adresses")
 }
 
 model Room {
-  id           String            @id @default(uuid())
-  name         String
-  description  String
-  type         String
-  price        Int
-  images       String?
-  status       ReservationStatus @default(PENDING)
+  id          String            @id @default(uuid())
+  name        String
+  description String
+  type        String
+  price       Decimal
+  images      String?
+  status      ReservationStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   reservations Reservation[]
 
   @@map("rooms")
 }
 
 model Service {
-  id           String        @id @default(uuid())
-  Cofre        Int?
-  Lavanderia   Int?
-  Cafe         Int?
-  Massagem     Int?
-  Frigobar     Int?
-  Transfer     Int?
-  reservations Reservation[]
+  id                  String                @id @default(uuid())
+  Cofre               Int?
+  Lavanderia          Int?
+  Cafe                Int?
+  Massagem            Int?
+  Frigobar            Int?
+  Transfer            Int?
+  Reservation         Reservation[]
+  ReservationServices ReservationServices[]
 
   @@map("services")
 }
 
 model Reservation {
-  id               String    @id @default(uuid())
-  peoples          Int       @default(0)
+  id               String             @id @default(uuid())
+  peoples          Int                @default(0)
+  cupom            String?
+  total            Int
+  totalDiscount    Int
+  confirmation     Boolean            @default(false)
+  dateConfirmation DateTime?
   checkIn          DateTime
   checkOut         DateTime
-  cupom            String?
-  total            Int       @default(0)
-  totalDescount    Int       @default(0)
-  confirmation     Boolean   @default(false)
-  dateConfirmation DateTime?
-  serviceId        String?
-  roomId           String
-  userId           String
-  user             User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  room             Room?     @relation(fields: [roomId], references: [id])
-  services         Service?  @relation(fields: [serviceId], references: [id])
+  status           ReservationPayment @default(PENDING)
+
+  userId    String
+  roomId    String
+  serviceId String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  ReservationServices ReservationServices[]
+  service             Service?              @relation(fields: [serviceId], references: [id])
 
   @@unique([userId, roomId, checkIn])
   @@map("reservations")
+}
+
+model ReservationServices {
+  reservationId String
+  serviceId     String
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  service     Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([reservationId, serviceId])
 }
 
 model Feedback {
