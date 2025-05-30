@@ -45,12 +45,36 @@ const roomController: { [key: string]: RequestHandler } = {
     const { id } = req.params;
 
     if (!id) {
+      res.status(400).json({ error: "Parametro ID ausente na requisição" });
       return;
     }
 
-    const room = await roomService.update(id, req.body);
+    try {
+      const upatedRoomFields = roomValidator.update(req.body);
 
-    res.status(200).json(room);
+      if (!upatedRoomFields.success) {
+        res.status(400).json({
+          error: upatedRoomFields.error.flatten().fieldErrors,
+        });
+        return;
+      }
+
+      const existingRoom = await roomService.getbyId(id);
+
+      if (!existingRoom) {
+        res.status(404).json({ error: "Quarto não localizado" });
+        return;
+      }
+
+      const updateRoom = await roomService.update(
+        existingRoom.id,
+        upatedRoomFields.data
+      );
+
+      res.status(200).json(updateRoom);
+    } catch (error) {
+      res.status(500).json({ erro: "Erro ao atualizar o quarto" });
+    }
   },
 
   delete: async (req, res) => {

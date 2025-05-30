@@ -7,6 +7,29 @@ const reservationService = {
     const reservations = await prisma.reservation.findMany({
       select: {
         id: true,
+        peoples: true,
+        checkIn: true,
+        checkOut: true,
+        totalDiscount: true,
+        total: true,
+        status: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        room: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            description: true,
+            images: true,
+            type: true,
+          },
+        },
       },
     });
 

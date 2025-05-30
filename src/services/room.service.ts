@@ -6,6 +6,11 @@ const roomService = {
     const rooms = await prisma.room.findMany({
       select: {
         id: true,
+        name: true,
+        type: true,
+        description: true,
+        price: true,
+        status: true,
       },
     });
 
@@ -15,15 +20,29 @@ const roomService = {
   getbyId: async (id: string) => {
     const room = await prisma.room.findUnique({
       where: { id },
-      select: {},
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        description: true,
+        price: true,
+        status: true,
+      },
     });
 
     return room;
   },
 
-  create: async (payload: Prisma.RoomCreateInput) => {
+  create: async ({
+    name,
+    type,
+    description,
+    price,
+    images,
+    status,
+  }: Prisma.RoomCreateInput) => {
     const newRoom = await prisma.room.create({
-      data: { ...payload },
+      data: { name, type, description, price, images, status },
       select: {
         id: true,
         name: true,
@@ -39,12 +58,22 @@ const roomService = {
     return newRoom;
   },
 
-  update: async (id: string, payload: Prisma.RoomUpdateInput) => {
+  update: async (
+    id: string,
+    { name, type, description, price, images, status }: Prisma.RoomUpdateInput
+  ) => {
     const user = await prisma.room.update({
       where: { id },
-      data: { ...payload },
+      data: { name, type, description, price, images, status },
       select: {
         id: true,
+        name: true,
+        type: true,
+        description: true,
+        price: true,
+        images: true,
+        status: true,
+        reservations: true,
       },
     });
 

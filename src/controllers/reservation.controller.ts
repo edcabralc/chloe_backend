@@ -39,8 +39,8 @@ const reservationController: { [key: string]: RequestHandler } = {
       checkOut,
       totalDiscount,
       total,
-      roomId: room.id,
-      userId: user.id,
+      roomId: room,
+      userId: user,
     });
 
     res.status(201).json(book);

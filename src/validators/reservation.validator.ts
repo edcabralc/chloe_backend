@@ -6,8 +6,10 @@ const reservationSchema = z.object({
   checkOut: z.string().min(1, "Data de check-out é obrigatória"),
   totalDiscount: z.number().min(0, "Desconto total não pode ser negativo"),
   total: z.number().min(0, "Total não pode ser negativo"),
-  room: z.object({ id: z.string().min(1, "ID do quarto é obrigatório") }),
-  user: z.object({ id: z.string().min(1, "ID do usuário é obrigatório") }),
+  // room: z.object({ id: z.string().min(1, "ID do quarto é obrigatório") }),
+  // user: z.object({ id: z.string().min(1, "ID do usuário é obrigatório") }),
+  user: z.string().uuid(),
+  room: z.string().uuid(),
 });
 
 const reservationValidator = {

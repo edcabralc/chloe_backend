@@ -13,16 +13,18 @@ enum Role {
   GUEST
 }
 
-enum ReservationStatus {
-  PENDING
-  CANCEL
-  RESERVED
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+  CLEANING
+  OUT_OF_SERVICE
 }
 
 enum ReservationPayment {
   PENDING
-  PAID
-  UNPAID
+  CONFIRMED
+  CANCELLED
 }
 
 model User {
@@ -64,13 +66,13 @@ model Address {
 }
 
 model Room {
-  id          String            @id @default(uuid())
+  id          String     @id @default(uuid())
   name        String
   description String
   type        String
   price       Decimal
   images      String?
-  status      ReservationStatus @default(PENDING)
+  status      RoomStatus @default(AVAILABLE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
