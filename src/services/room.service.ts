@@ -2,8 +2,8 @@ import { prisma } from "@/libs/prisma";
 import { Prisma } from "@prisma/client";
 
 const roomService = {
-  get: async () => {
-    const rooms = await prisma.room.findMany({
+  get: async () =>
+    await prisma.room.findMany({
       select: {
         id: true,
         name: true,
@@ -12,13 +12,10 @@ const roomService = {
         price: true,
         status: true,
       },
-    });
+    }),
 
-    return rooms;
-  },
-
-  getbyId: async (id: string) => {
-    const room = await prisma.room.findUnique({
+  getbyId: async (id: string) =>
+    await prisma.room.findUnique({
       where: { id },
       select: {
         id: true,
@@ -28,10 +25,7 @@ const roomService = {
         price: true,
         status: true,
       },
-    });
-
-    return room;
-  },
+    }),
 
   create: async ({
     name,
@@ -40,8 +34,8 @@ const roomService = {
     price,
     images,
     status,
-  }: Prisma.RoomCreateInput) => {
-    const newRoom = await prisma.room.create({
+  }: Prisma.RoomCreateInput) =>
+    await prisma.room.create({
       data: { name, type, description, price, images, status },
       select: {
         id: true,
@@ -53,16 +47,13 @@ const roomService = {
         status: true,
         reservations: true,
       },
-    });
-
-    return newRoom;
-  },
+    }),
 
   update: async (
     id: string,
     { name, type, description, price, images, status }: Prisma.RoomUpdateInput
-  ) => {
-    const user = await prisma.room.update({
+  ) =>
+    await prisma.room.update({
       where: { id },
       data: { name, type, description, price, images, status },
       select: {
@@ -75,15 +66,9 @@ const roomService = {
         status: true,
         reservations: true,
       },
-    });
+    }),
 
-    return user;
-  },
-
-  delete: async (id: string) => {
-    await prisma.room.delete({ where: { id } });
-    return true;
-  },
+  delete: async (id: string) => await prisma.room.delete({ where: { id } }),
 };
 
 export { roomService };

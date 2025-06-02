@@ -3,7 +3,7 @@ import { roomValidator } from "@/validators/room.validator";
 import { RequestHandler } from "express";
 
 const roomController: { [key: string]: RequestHandler } = {
-  get: async (req, res) => {
+  get: async (_req, res) => {
     const rooms = await roomService.get();
 
     res.status(200).json(rooms);
@@ -11,13 +11,23 @@ const roomController: { [key: string]: RequestHandler } = {
 
   getById: async (req, res) => {
     const { id } = req.params;
+
     if (!id) {
       return;
     }
 
-    const room = await roomService.getbyId(id);
+    try {
+      const existingRoom = await roomService.getbyId(id);
 
-    res.status(200).json(room);
+      if (!existingRoom) {
+        res.status(404).json({ error: "Quarto não localizado" });
+        return;
+      }
+
+      res.status(200).json(existingRoom);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar o quarto" });
+    }
   },
 
   create: async (req, res) => {
@@ -81,12 +91,24 @@ const roomController: { [key: string]: RequestHandler } = {
     const { id } = req.params;
 
     if (!id) {
+      res.status(400).json({ error: "Parametro ID ausente na requisição" });
       return;
     }
 
-    await roomService.delete(id);
+    try {
+      const existingRoom = await roomService.getbyId(id);
 
-    res.status(300).json({ message: "Registro removido com sucesso" });
+      if (!existingRoom) {
+        res.status(404).json({ error: "Quarto não localizado" });
+        return;
+      }
+
+      await roomService.delete(existingRoom.id);
+
+      res.status(200).json({ message: "Quarto removido com sucesso" });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao remover quarto" });
+    }
   },
 };
 
