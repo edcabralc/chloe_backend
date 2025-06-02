@@ -73,11 +73,6 @@ const userService = {
     return user;
   },
 
-  delete: async (id: string) => {
-    await prisma.user.delete({ where: { id } });
-    return true;
-  },
-
   verifyUser: async ({ email, password }: Pick<User, "email" | "password">) => {
     const user = await prisma.user.findFirst({ where: { email } });
 
@@ -88,7 +83,11 @@ const userService = {
     if (!bcrypt.compareSync(password, user.password)) {
       return false;
     }
+
+    return user;
   },
+
+  delete: async (id: string) => await prisma.user.delete({ where: { id } }),
 };
 
 export { userService };

@@ -31,24 +31,25 @@ const roomController: { [key: string]: RequestHandler } = {
   },
 
   create: async (req, res) => {
-    const roomParsed = roomValidator.create(req.body);
+    const validationResult = roomValidator.create(req.body);
 
-    if (!roomParsed.success) {
+    if (!validationResult.success) {
       res.status(400).json({
-        error: roomParsed.error.flatten().fieldErrors,
+        error: validationResult.error.flatten().fieldErrors,
       });
       return;
     }
 
-    const { name, type, description, price } = roomParsed.data;
+    const { name, type, description, price } = validationResult.data;
 
-    if (!name || !description || !price) {
-      return;
-    }
+    const newRoom = await roomService.create({
+      name,
+      type,
+      description,
+      price,
+    });
 
-    const room = await roomService.create({ name, type, description, price });
-
-    res.status(201).json(room);
+    res.status(201).json(newRoom);
   },
 
   update: async (req, res) => {
@@ -59,16 +60,18 @@ const roomController: { [key: string]: RequestHandler } = {
       return;
     }
 
+    const validationResult = roomValidator.update(req.body);
+
+    if (!validationResult.success) {
+      res.status(400).json({
+        error: validationResult.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const { name, type, description, price, status } = validationResult.data;
+
     try {
-      const upatedRoomFields = roomValidator.update(req.body);
-
-      if (!upatedRoomFields.success) {
-        res.status(400).json({
-          error: upatedRoomFields.error.flatten().fieldErrors,
-        });
-        return;
-      }
-
       const existingRoom = await roomService.getbyId(id);
 
       if (!existingRoom) {
@@ -76,10 +79,13 @@ const roomController: { [key: string]: RequestHandler } = {
         return;
       }
 
-      const updateRoom = await roomService.update(
-        existingRoom.id,
-        upatedRoomFields.data
-      );
+      const updateRoom = await roomService.update(existingRoom.id, {
+        name,
+        type,
+        description,
+        price,
+        status,
+      });
 
       res.status(200).json(updateRoom);
     } catch (error) {
