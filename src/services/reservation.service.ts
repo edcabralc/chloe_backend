@@ -30,6 +30,13 @@ const reservationService = {
             type: true,
           },
         },
+        services: {
+          select: {
+            id: true,
+            price: true,
+            description: true,
+          },
+        },
       },
     });
 
@@ -45,28 +52,57 @@ const reservationService = {
     return reservation;
   },
 
+  getbyEmail: async (email: string) => {
+    const reservation = await prisma.reservation.findMany({
+      where: { user: { email: email } },
+      include: {
+        room: true,
+        services: true,
+      },
+      orderBy: { checkIn: "desc" },
+    });
+
+    return reservation;
+  },
+
   create: async ({
     peoples,
     checkIn,
     checkOut,
-    totalDiscount,
-    total,
     roomId,
     userId,
+    services,
   }: ReservationType) => {
+    const room = await prisma.room.findUnique({ where: { id: roomId } });
+
+    const existingServices = await prisma.service.findMany({
+      where: { id: { in: services || [] } },
+    });
+
+    const roomPrice = room?.price ? Number(room.price) : 0;
+    const serviceTotal = existingServices.reduce(
+      (acc, service) => acc + Number(service.price),
+      0
+    );
+
+    const totalPrice = roomPrice + serviceTotal;
+
     const reservation = await prisma.reservation.create({
       data: {
         peoples,
         checkIn,
         checkOut,
-        totalDiscount,
-        total,
+        total: totalPrice,
+        totalDiscount: 0,
         room: { connect: { id: roomId } },
         user: { connect: { id: userId } },
+        services: {
+          connect: services?.map(service => ({ id: service })),
+        },
       },
 
-      select: {
-        id: true,
+      include: {
+        services: true,
       },
     });
 

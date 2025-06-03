@@ -60,7 +60,7 @@ model Address {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User? @relation("UserAdress", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation("UserAdress", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("adresses")
 }
@@ -83,17 +83,11 @@ model Room {
 }
 
 model Service {
-  id                  String                @id @default(uuid())
-  description         String
-  price               Decimal
-  // cofre               Int?
-  // lavanderia          Int?
-  // cafe                Int?
-  // massagem            Int?
-  // frigobar            Int?
-  // transfer            Int?
-  reservation         Reservation[]
-  reservationServices ReservationServices[]
+  id          String  @id @default(uuid())
+  description String
+  price       Decimal
+
+  reservations Reservation[] @relation("ReservationService")
 
   @@map("services")
 }
@@ -110,31 +104,15 @@ model Reservation {
   checkOut         DateTime
   status           ReservationPayment @default(PENDING)
 
-  userId    String
-  roomId    String
-  serviceId String?
+  userId String
+  roomId String
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  reservationServices ReservationServices[]
-  service             Service?              @relation(fields: [serviceId], references: [id])
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  room     Room      @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  services Service[] @relation("ReservationService")
 
   @@unique([userId, roomId, checkIn])
   @@map("reservations")
-}
-
-model ReservationServices {
-  reservationId String
-  serviceId     String
-
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
-
-  service     Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@id([reservationId, serviceId])
 }
 
 model Feedback {

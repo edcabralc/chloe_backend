@@ -30,17 +30,16 @@ const reservationController: { [key: string]: RequestHandler } = {
       return;
     }
 
-    const { peoples, checkIn, checkOut, total, totalDiscount, room, user } =
+    const { peoples, checkIn, checkOut, room, user, services } =
       reservationParsed.data;
 
     const book = await reservationService.create({
       peoples,
       checkIn,
       checkOut,
-      totalDiscount,
-      total,
       roomId: room,
       userId: user,
+      services,
     });
 
     res.status(201).json(book);

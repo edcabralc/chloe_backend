@@ -9,7 +9,8 @@
       "@routes": ["src/routes/*"],
       "@controllers": ["src/controllers/*"],
       "@services": ["src/services/*"],
-      "@libs": ["src/libs/*"]
+      "@libs": ["src/libs/*"],
+      "@middlewares": ["src/middlewares/*"]
     },
     "resolveJsonModule": true,
     "outDir": "dist",
