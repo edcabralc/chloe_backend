@@ -6,6 +6,6 @@ const authRoutes = Router();
 
 authRoutes.post("/signup", authController.signup);
 authRoutes.post("/signin", authController.signin);
-authRoutes.post("/validate", authMiddleware, authController.validate);
+authRoutes.post("/validate", authMiddleware.private, authController.validate);
 
 export { authRoutes };

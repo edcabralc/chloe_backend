@@ -1,4 +1,4 @@
-import { serviceController } from "@/controllers/service.controller";
+import { serviceController } from "@controllers/service.controller";
 import { Router } from "express";
 
 const serviceRoutes = Router();

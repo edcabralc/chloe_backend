@@ -1,4 +1,4 @@
-import { reservationController } from "@/controllers/reservation.controller";
+import { reservationController } from "@controllers/reservation.controller";
 import { Router } from "express";
 
 const reservationRoutes = Router();

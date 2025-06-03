@@ -1,6 +1,6 @@
-import { prisma } from "@/libs/prisma";
-import { ReservationType } from "@/types/reservation.type";
+import { prisma } from "@libs/prisma";
 import { Prisma } from "@prisma/client";
+import { ReservationType } from "types/reservation.type";
 
 const reservationService = {
   get: async () => {

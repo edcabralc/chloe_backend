@@ -1,5 +1,5 @@
-import { reservationService } from "@/services/reservation.service";
-import { reservationValidator } from "@/validators/reservation.validator";
+import { reservationService } from "@services/reservation.service";
+import { reservationValidator } from "@validators/reservation.validator";
 import { RequestHandler } from "express";
 
 const reservationController: { [key: string]: RequestHandler } = {

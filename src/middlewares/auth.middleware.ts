@@ -1,3 +1,5 @@
-const authMiddleware = {};
+const authMiddleware = {
+  private: () => {},
+};
 
 export { authMiddleware };

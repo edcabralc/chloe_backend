@@ -1,5 +1,5 @@
-import { roomService } from "@/services/room.service";
-import { roomValidator } from "@/validators/room.validator";
+import { roomService } from "@services/room.service";
+import { roomValidator } from "@validators/room.validator";
 import { RequestHandler } from "express";
 
 const roomController: { [key: string]: RequestHandler } = {

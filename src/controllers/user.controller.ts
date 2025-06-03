@@ -1,5 +1,5 @@
-import { userService } from "@/services/user.service";
-import { userValidator } from "@/validators/user.validator";
+import { userService } from "@services/user.service";
+import { userValidator } from "@validators/user.validator";
 import { RequestHandler } from "express";
 
 const userController: { [key: string]: RequestHandler } = {
