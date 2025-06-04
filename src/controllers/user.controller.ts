@@ -28,9 +28,14 @@ const userController: { [key: string]: RequestHandler } = {
       return;
     }
 
-    const { name, email, password } = userParsed.data;
+    const { name, email, password, role } = userParsed.data;
 
-    const user = await userService.create({ name, email, password });
+    const user = await userService.create({
+      name,
+      email,
+      password,
+      role,
+    });
 
     if (!user) {
       res.status(400).json({ error: "Erro ao criar usuário" });

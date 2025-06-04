@@ -12,6 +12,6 @@ mainRoutes.use("/users", userRoutes);
 mainRoutes.use("/reservations", reservationRoutes);
 mainRoutes.use("/rooms", roomRoutes);
 mainRoutes.use("/services", serviceRoutes);
-mainRoutes.use("/", authRoutes);
+mainRoutes.use("/auth", authRoutes);
 
 export { mainRoutes };

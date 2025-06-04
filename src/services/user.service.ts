@@ -17,6 +17,9 @@ const userService = {
     return users;
   },
 
+  getByEmail: async (email: string) =>
+    await prisma.user.findFirst({ where: { email } }),
+
   getbyId: async (id: string) => {
     const user = await prisma.user.findUnique({
       where: { id },
@@ -36,7 +39,8 @@ const userService = {
     name,
     email,
     password,
-  }: Pick<User, "name" | "email" | "password">) => {
+    role,
+  }: Pick<User, "name" | "email" | "password" | "role">) => {
     email = email.toLocaleLowerCase();
 
     const user = await prisma.user.findFirst({ where: { email } });
@@ -48,7 +52,7 @@ const userService = {
     const hashedPassword = bcrypt.hashSync(password);
 
     return await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+      data: { name, email, password: hashedPassword, role },
       select: {
         id: true,
         name: true,

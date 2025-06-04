@@ -4,8 +4,8 @@ import { Router } from "express";
 
 const authRoutes = Router();
 
-authRoutes.post("/signup", authController.signup);
-authRoutes.post("/signin", authController.signin);
+authRoutes.post("/register", authController.register);
+authRoutes.post("/login", authController.login);
 authRoutes.post("/validate", authMiddleware.private, authController.validate);
 
 export { authRoutes };
