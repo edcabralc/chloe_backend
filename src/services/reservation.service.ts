@@ -1,6 +1,7 @@
 import { prisma } from "@libs/prisma";
 import { Prisma } from "@prisma/client";
 import { ReservationType } from "types/reservation.type";
+import { generateTotal } from "utils/generateTotal.util";
 
 const reservationService = {
   get: async () => {
@@ -83,9 +84,8 @@ const reservationService = {
     });
 
     const roomPrice = room?.price ? Number(room.price) : 0;
-    const serviceTotal = existingServices.reduce((acc, service) => acc + Number(service.price), 0);
 
-    const totalPrice = roomPrice + serviceTotal;
+    const totalPrice = generateTotal(roomPrice, existingServices);
 
     const reservation = await prisma.reservation.create({
       data: {
@@ -109,12 +109,34 @@ const reservationService = {
     return reservation;
   },
 
-  update: async (id: string, payload: Prisma.ReservationUpdateInput) => {
+  update: async (id: string, { peoples, checkIn, checkOut, total, services }: Prisma.ReservationUpdateInput) => {
+    const existingReservation = await prisma.reservation.findUnique({
+      where: { id },
+      include: { room: true, services: true },
+    });
+
+    if (!existingReservation) {
+      console.log("Reservation not found");
+      return;
+    }
+
     const reservation = await prisma.reservation.update({
       where: { id },
-      data: { ...payload },
-      select: {
-        id: true,
+      data: {
+        peoples,
+        checkIn,
+        checkOut,
+        total: existingReservation.total,
+        totalDiscount: 0,
+
+        services: Array.isArray(services)
+          ? { set: [], connect: services.map(service => ({ id: service })) }
+          : undefined,
+      },
+
+      include: {
+        services: true,
+        room: true,
       },
     });
 

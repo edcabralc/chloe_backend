@@ -1,3 +1,4 @@
+import { prisma } from "@libs/prisma";
 import { reservationService } from "@services/reservation.service";
 import { reservationValidator } from "@validators/reservation.validator";
 import { RequestHandler } from "express";
@@ -64,6 +65,37 @@ const reservationController: { [key: string]: RequestHandler } = {
     res.status(201).json(book);
   },
 
+  createByGuest: async (req: ExtendedRequest, res) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(400).json({ error: "Usuário não autenticado" });
+      return;
+    }
+
+    const reservationParsed = reservationValidator.createByUser(req.body);
+
+    if (!reservationParsed.success) {
+      res.status(400).json({
+        error: reservationParsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const { peoples, checkIn, checkOut, room, services } = reservationParsed.data;
+
+    const book = await reservationService.create({
+      peoples,
+      checkIn,
+      checkOut,
+      roomId: room,
+      userId,
+      services,
+    });
+
+    res.status(201).json(book);
+  },
+
   update: async (req, res) => {
     const { id } = req.params;
 
@@ -75,6 +107,50 @@ const reservationController: { [key: string]: RequestHandler } = {
 
     res.status(200).json(user);
   },
+
+  updateByGuest: async (req: ExtendedRequest, res) => {
+    const userId = req.user?.id;
+    const validationResult = reservationValidator.updateByUser(req.body);
+
+    if (!validationResult.success) {
+      res.status(400).json({
+        error: validationResult.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const { peoples, checkIn, checkOut, services } = validationResult.data;
+
+    try {
+      const existingReservation = await prisma.reservation.findFirst({
+        where: { userId },
+      });
+
+      if (!existingReservation) {
+        res.status(404).json({ error: "Reserva não encontrada." });
+        return;
+      }
+
+      if (userId !== existingReservation?.userId) {
+        res.status(403).json({ error: "Você não tem permissão para atualizar esta reserva." });
+        return;
+      }
+
+      const updatedReservation = await reservationService.update(existingReservation.id, {
+        peoples,
+        checkIn,
+        checkOut,
+        services: { connect: services?.map(service => ({ id: service })) },
+      });
+
+      res.status(200).json(updatedReservation);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao atualizar reserva." });
+      return;
+    }
+  },
+
+  aproveReserve: async () => {},
 
   delete: async (req, res) => {
     const { id } = req.params;

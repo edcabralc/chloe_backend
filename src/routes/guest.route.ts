@@ -5,7 +5,9 @@ import { Router } from "express";
 const guestRoutes = Router();
 
 guestRoutes.get("/reservations", reservationController.getGuestReservationId);
-guestRoutes.post("/reservations", reservationController.create);
+guestRoutes.get("/reservations/:id", reservationController.getGuestReservationId);
+guestRoutes.post("/reservations", reservationController.createByGuest);
+guestRoutes.patch("/reservations/:id", reservationController.updateByGuest);
 guestRoutes.delete("/reservations/:id", reservationController.delete);
 
 export { guestRoutes };
