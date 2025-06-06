@@ -27,14 +27,7 @@ const roomService = {
       },
     }),
 
-  create: async ({
-    name,
-    type,
-    description,
-    price,
-    images,
-    status,
-  }: Prisma.RoomCreateInput) =>
+  create: async ({ name, type, description, price, images, status }: Prisma.RoomCreateInput) =>
     await prisma.room.create({
       data: { name, type, description, price, images, status },
       select: {
@@ -49,10 +42,7 @@ const roomService = {
       },
     }),
 
-  update: async (
-    id: string,
-    { name, type, description, price, images, status }: Prisma.RoomUpdateInput
-  ) =>
+  update: async (id: string, { name, type, description, price, images, status }: Prisma.RoomUpdateInput) =>
     await prisma.room.update({
       where: { id },
       data: { name, type, description, price, images, status },

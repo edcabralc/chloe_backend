@@ -1,31 +1,32 @@
-import { generateToken } from "@libs/jwt";
+import { generateToken, verifyToken } from "@libs/jwt";
 import { User } from "@prisma/client";
-// import { TokenPaylod } from "types/token-payload";
-// import { User } from "../../generated/prisma/client";
-// import { userService } from "./user.service";
+import { userService } from "@services/user.service";
+import { Request } from "express";
+import { TokenPayload } from "types/token-payload";
 
 const authService = {
-  // verifyRequest: async (req: Request) => {
-  //   const { authorization } = req.headers;
+  verifyRequest: async (req: Request) => {
+    const { authorization } = req.headers;
 
-  //   if (authorization) {
-  //     const authSplit = authorization.split("Bearer ");
+    if (authorization) {
+      const authSplit = authorization.split("Bearer ");
 
-  //     if (authSplit[1]) {
-  //       const payload = readJWT(authSplit[1]);
+      if (authSplit[1]) {
+        const payload = verifyToken(authSplit[1]) as TokenPayload | null;
 
-  //       if (payload) {
-  //         const userId = (payload as TokenPaylod).id;
-  //         const user = await userService.getUserById(userId);
+        if (payload) {
+          const userId = payload.id;
 
-  //         if (user) {
-  //           return user;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // },
+          const user = await userService.getbyId(userId);
+
+          if (user) {
+            return user;
+          }
+        }
+      }
+    }
+    return null;
+  },
 
   createToken: (user: Pick<User, "id" | "name" | "email" | "role">) =>
     generateToken({

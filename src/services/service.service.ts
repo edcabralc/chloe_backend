@@ -4,8 +4,7 @@ import { Prisma } from "@prisma/client";
 const serviceService = {
   get: async () => await prisma.service.findMany(),
 
-  getById: async (id: string) =>
-    await prisma.service.findFirst({ where: { id } }),
+  getById: async (id: string) => await prisma.service.findFirst({ where: { id } }),
 
   create: async ({ description, price }: Prisma.ServiceCreateInput) =>
     await prisma.service.create({
@@ -17,10 +16,7 @@ const serviceService = {
       },
     }),
 
-  update: async (
-    id: string,
-    { description, price }: Prisma.ServiceUpdateInput
-  ) =>
+  update: async (id: string, { description, price }: Prisma.ServiceUpdateInput) =>
     await prisma.service.update({
       where: { id },
       data: { description, price },

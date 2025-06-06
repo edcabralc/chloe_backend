@@ -65,14 +65,17 @@ const reservationService = {
     return reservation;
   },
 
-  create: async ({
-    peoples,
-    checkIn,
-    checkOut,
-    roomId,
-    userId,
-    services,
-  }: ReservationType) => {
+  getByUser: async (userId: string) => {
+    const reservation = await prisma.reservation.findMany({
+      where: { userId },
+      include: { room: true, services: true },
+    });
+
+    console.log("No service:", reservation);
+    return reservation;
+  },
+
+  create: async ({ peoples, checkIn, checkOut, roomId, userId, services }: ReservationType) => {
     const room = await prisma.room.findUnique({ where: { id: roomId } });
 
     const existingServices = await prisma.service.findMany({
@@ -80,10 +83,7 @@ const reservationService = {
     });
 
     const roomPrice = room?.price ? Number(room.price) : 0;
-    const serviceTotal = existingServices.reduce(
-      (acc, service) => acc + Number(service.price),
-      0
-    );
+    const serviceTotal = existingServices.reduce((acc, service) => acc + Number(service.price), 0);
 
     const totalPrice = roomPrice + serviceTotal;
 

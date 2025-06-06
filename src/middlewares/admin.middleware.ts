@@ -1,20 +1,23 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
+import { ExtendedRequest } from "types/extended-request";
 import { Role } from "types/role.type";
 
-const adminMiddleware = (...allowedRoles: Role[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user;
+const privilegeAccess = (...allowedRoles: Role[]) => {
+  return (req: ExtendedRequest, res: Response, next: NextFunction) => {
+    const { user } = req;
 
     if (!user) {
-      return res.status(401).json({ error: "Usuário não autenticado" });
+      res.status(401).json({ error: "Usuário não autenticado" });
+      return;
     }
 
-    if (!allowedRoles.includes(user.role)) {
-      return res.status(403).json({ error: "Acesso negado" });
+    if (!allowedRoles.includes(user.role as Role)) {
+      res.status(403).json({ error: "Acesso negado" });
+      return;
     }
 
     next();
   };
 };
 
-export { adminMiddleware };
+export { privilegeAccess };

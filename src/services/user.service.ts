@@ -29,6 +29,7 @@ const userService = {
         email: true,
         status: true,
         imageProfile: true,
+        role: true,
       },
     });
 

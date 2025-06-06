@@ -11,9 +11,7 @@ const authController: { [keys: string]: RequestHandler } = {
     const validationResult = authValidador.register(req.body);
 
     if (!validationResult.success) {
-      res
-        .status(400)
-        .json({ erro: validationResult.error.flatten().fieldErrors });
+      res.status(400).json({ erro: validationResult.error.flatten().fieldErrors });
       return;
     }
 
@@ -45,9 +43,7 @@ const authController: { [keys: string]: RequestHandler } = {
     const valideteResult = authValidador.login(req.body);
 
     if (!valideteResult.success) {
-      res
-        .status(400)
-        .json({ error: valideteResult.error.flatten().fieldErrors });
+      res.status(400).json({ error: valideteResult.error.flatten().fieldErrors });
       return;
     }
 

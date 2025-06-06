@@ -3,7 +3,7 @@ import { userValidator } from "@validators/user.validator";
 import { RequestHandler } from "express";
 
 const userController: { [key: string]: RequestHandler } = {
-  get: async (req, res) => {
+  get: async (_req, res) => {
     const users = await userService.get();
 
     res.status(200).json(users);

@@ -1,9 +1,10 @@
 import { reservationService } from "@services/reservation.service";
 import { reservationValidator } from "@validators/reservation.validator";
 import { RequestHandler } from "express";
+import { ExtendedRequest } from "types/extended-request";
 
 const reservationController: { [key: string]: RequestHandler } = {
-  get: async (req, res) => {
+  get: async (_req, res) => {
     const reservations = await reservationService.get();
 
     res.status(200).json(reservations);
@@ -20,6 +21,25 @@ const reservationController: { [key: string]: RequestHandler } = {
     res.status(200).json(book);
   },
 
+  getGuestReservationId: async (req: ExtendedRequest, res) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(400).json({ error: "Usuário não autenticado" });
+      return;
+    }
+
+    try {
+      const reservations = await reservationService.getByUser(userId);
+      console.log("No controller", reservations);
+
+      res.status(200).json(reservations);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar reservas do usuário" });
+      return;
+    }
+  },
+
   create: async (req, res) => {
     const reservationParsed = reservationValidator.create(req.body);
 
@@ -30,8 +50,7 @@ const reservationController: { [key: string]: RequestHandler } = {
       return;
     }
 
-    const { peoples, checkIn, checkOut, room, user, services } =
-      reservationParsed.data;
+    const { peoples, checkIn, checkOut, room, user, services } = reservationParsed.data;
 
     const book = await reservationService.create({
       peoples,
