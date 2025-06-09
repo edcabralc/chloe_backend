@@ -1,5 +1,6 @@
-import { prisma } from "@/libs/prisma";
-import { Prisma } from "@prisma/client";
+import { prisma } from "@libs/prisma";
+import { Prisma, User } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const userService = {
   get: async () => {
@@ -10,14 +11,19 @@ const userService = {
         email: true,
         status: true,
         imageProfile: true,
+        address: {
+          include: {},
+        },
       },
     });
 
     return users;
   },
 
-  getbyId: async (id: string) => {
-    const user = await prisma.user.findUnique({
+  getByEmail: async (email: string) => await prisma.user.findFirst({ where: { email } }),
+
+  getbyId: async (id: string) =>
+    await prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
@@ -25,15 +31,24 @@ const userService = {
         email: true,
         status: true,
         imageProfile: true,
+        role: true,
+        address: { include: {} },
       },
-    });
+    }),
 
-    return user;
-  },
+  create: async ({ name, email, password, role }: Pick<User, "name" | "email" | "password" | "role">) => {
+    email = email.toLocaleLowerCase();
 
-  create: async (payload: Prisma.UserCreateInput) => {
-    const newUser = await prisma.user.create({
-      data: { ...payload },
+    const user = await prisma.user.findFirst({ where: { email } });
+
+    if (user) {
+      return false;
+    }
+
+    const hashedPassword = bcrypt.hashSync(password);
+
+    return await prisma.user.create({
+      data: { name, email, password: hashedPassword, role },
       select: {
         id: true,
         name: true,
@@ -41,8 +56,6 @@ const userService = {
         status: true,
       },
     });
-
-    return newUser;
   },
 
   update: async (id: string, payload: Prisma.UserUpdateInput) => {
@@ -60,10 +73,21 @@ const userService = {
     return user;
   },
 
-  delete: async (id: string) => {
-    await prisma.user.delete({ where: { id } });
-    return true;
+  verifyUser: async ({ email, password }: Pick<User, "email" | "password">) => {
+    const user = await prisma.user.findFirst({ where: { email } });
+
+    if (!user) {
+      return false;
+    }
+
+    if (!bcrypt.compareSync(password, user.password)) {
+      return false;
+    }
+
+    return user;
   },
+
+  delete: async (id: string) => await prisma.user.delete({ where: { id } }),
 };
 
 export { userService };

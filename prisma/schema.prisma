@@ -10,27 +10,37 @@ datasource db {
 enum Role {
   ADMIN
   EMPLOYEE
-  USER
+  GUEST
 }
 
-enum ReservationStatus {
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+  CLEANING
+  OUT_OF_SERVICE
+}
+
+enum ReservationPayment {
   PENDING
-  CANCEL
-  RESERVED
+  CONFIRMED
+  CANCELLED
 }
 
 model User {
-  id           String    @id @default(uuid())
+  id           String  @id @default(uuid())
   name         String
-  email        String    @unique
+  email        String  @unique
   password     String
-  role         Role      @default(USER)
-  status       Boolean   @default(true)
+  status       Boolean @default(true)
+  role         Role    @default(GUEST)
   imageProfile String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @default(now()) @updatedAt
-  Address      Address[]
-  Book         Book[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  address      Address[]     @relation("UserAdress")
+  reservations Reservation[]
 
   @@map("users")
 }
@@ -46,27 +56,63 @@ model Address {
   estado      String
   pais        String
   userId      String
-  user        User?  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation("UserAdress", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("adresses")
 }
 
-model Book {
-  id               String   @id @default(uuid())
-  qtdPeople        Int      @default(0)
+model Room {
+  id          String     @id @default(uuid())
+  name        String
+  description String
+  type        String
+  price       Decimal
+  images      String?
+  status      RoomStatus @default(AVAILABLE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reservations Reservation[]
+
+  @@map("rooms")
+}
+
+model Service {
+  id          String  @id @default(uuid())
+  description String
+  price       Decimal
+
+  reservations Reservation[] @relation("ReservationService")
+
+  @@map("services")
+}
+
+model Reservation {
+  id               String             @id @default(uuid())
+  peoples          Int                @default(0)
+  cupom            String?
+  total            Int
+  totalDiscount    Int
+  confirmation     Boolean            @default(false)
+  dateConfirmation DateTime?
   checkIn          DateTime
   checkOut         DateTime
-  cupom            String
-  total            Int      @default(0)
-  totalDescount    Int      @default(0)
-  confirmation     Boolean  @default(false)
-  dateConfirmation DateTime
-  serviceId        String
-  services         Service? @relation(fields: [serviceId], references: [id])
-  userId           String
-  user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  status           ReservationPayment @default(PENDING)
 
-  @@map("books")
+  userId String
+  roomId String
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  room     Room      @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  services Service[] @relation("ReservationService")
+
+  @@unique([userId, roomId, checkIn])
+  @@map("reservations")
 }
 
 model Feedback {
@@ -76,29 +122,4 @@ model Feedback {
   status    Boolean
 
   @@map("feedbacks")
-}
-
-model Room {
-  id          String            @id @default(uuid())
-  name        String
-  type        String
-  status      ReservationStatus @default(PENDING)
-  description String
-  price       Int
-  images      String
-
-  @@map("rooms")
-}
-
-model Service {
-  id         String @id @default(uuid())
-  Cofre      Int?
-  Lavanderia Int?
-  Cafe       Int?
-  Massagem   Int?
-  Frigobar   Int?
-  Transfer   Int?
-  Book       Book[]
-
-  @@map("services")
 }

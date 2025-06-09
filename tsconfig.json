@@ -3,18 +3,20 @@
     "target": "es2016",
     "module": "commonjs",
     "rootDir": "./",
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "paths": {
       "@/*": ["src/*"],
-      "@routes": ["src/routes/*"],
-      "@controllers": ["src/controllers/*"],
-      "@services": ["src/services/*"],
-      "@libs": ["src/libs/*"]
+      "@routes/*": ["routes/*"],
+      "@controllers/*": ["controllers/*"],
+      "@services/*": ["services/*"],
+      "@libs/*": ["libs/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@validators/*": ["validators/*"],
+      "types/*": ["types/*"]
     },
-    "resolveJsonModule": true,
-    "outDir": "dist",
+
+    "outDir": "./dist",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true
   }
