@@ -11,17 +11,19 @@ const userService = {
         email: true,
         status: true,
         imageProfile: true,
+        address: {
+          include: {},
+        },
       },
     });
 
     return users;
   },
 
-  getByEmail: async (email: string) =>
-    await prisma.user.findFirst({ where: { email } }),
+  getByEmail: async (email: string) => await prisma.user.findFirst({ where: { email } }),
 
-  getbyId: async (id: string) => {
-    const user = await prisma.user.findUnique({
+  getbyId: async (id: string) =>
+    await prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
@@ -30,18 +32,11 @@ const userService = {
         status: true,
         imageProfile: true,
         role: true,
+        address: { include: {} },
       },
-    });
+    }),
 
-    return user;
-  },
-
-  create: async ({
-    name,
-    email,
-    password,
-    role,
-  }: Pick<User, "name" | "email" | "password" | "role">) => {
+  create: async ({ name, email, password, role }: Pick<User, "name" | "email" | "password" | "role">) => {
     email = email.toLocaleLowerCase();
 
     const user = await prisma.user.findFirst({ where: { email } });

@@ -22,6 +22,21 @@ const reservationController: { [key: string]: RequestHandler } = {
     res.status(200).json(book);
   },
 
+  getByGuest: async (req: ExtendedRequest, res) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(400).json({ error: "Usuário não autenticado" });
+      return;
+    }
+
+    try {
+      const reservationByGuest = await reservationService.getByUser(userId);
+
+      res.status(200).json(reservationByGuest);
+    } catch (error) {}
+  },
+
   getGuestReservationId: async (req: ExtendedRequest, res) => {
     const userId = req.user?.id;
 
@@ -32,7 +47,6 @@ const reservationController: { [key: string]: RequestHandler } = {
 
     try {
       const reservations = await reservationService.getByUser(userId);
-      console.log("No controller", reservations);
 
       res.status(200).json(reservations);
     } catch (error) {

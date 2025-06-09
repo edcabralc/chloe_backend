@@ -4,8 +4,8 @@ import { ReservationType } from "types/reservation.type";
 import { generateTotal } from "utils/generateTotal.util";
 
 const reservationService = {
-  get: async () => {
-    const reservations = await prisma.reservation.findMany({
+  get: async () =>
+    await prisma.reservation.findMany({
       select: {
         id: true,
         peoples: true,
@@ -39,42 +39,29 @@ const reservationService = {
           },
         },
       },
-    });
+    }),
 
-    return reservations;
-  },
-
-  getbyId: async (id: string) => {
-    const reservation = await prisma.reservation.findUnique({
+  getbyId: async (id: string) =>
+    await prisma.reservation.findUnique({
       where: { id },
-      select: {},
-    });
+      include: { room: true, services: true },
+    }),
 
-    return reservation;
-  },
-
-  getbyEmail: async (email: string) => {
-    const reservation = await prisma.reservation.findMany({
+  getbyEmail: async (email: string) =>
+    await prisma.reservation.findMany({
       where: { user: { email: email } },
       include: {
         room: true,
         services: true,
       },
       orderBy: { checkIn: "desc" },
-    });
+    }),
 
-    return reservation;
-  },
-
-  getByUser: async (userId: string) => {
-    const reservation = await prisma.reservation.findMany({
+  getByUser: async (userId: string) =>
+    await prisma.reservation.findMany({
       where: { userId },
       include: { room: true, services: true },
-    });
-
-    console.log("No service:", reservation);
-    return reservation;
-  },
+    }),
 
   create: async ({ peoples, checkIn, checkOut, roomId, userId, services }: ReservationType) => {
     const room = await prisma.room.findUnique({ where: { id: roomId } });

@@ -21,8 +21,8 @@ adminRoutes.delete("/rooms/:id", roomController.delete);
 adminRoutes.get("/reservations", reservationController.get);
 adminRoutes.get("/reservations/:id", reservationController.getById);
 adminRoutes.post("/reservations", reservationController.create);
-adminRoutes.patch("/reservations/:id");
-adminRoutes.delete("/reservations/:id");
+adminRoutes.patch("/reservations/:id", reservationController.update);
+adminRoutes.delete("/reservations/:id", reservationController.delete);
 
 adminRoutes.get("/services", serviceController.get);
 adminRoutes.get("/services/:id", serviceController.getById);
