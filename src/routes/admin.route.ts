@@ -18,11 +18,11 @@ adminRoutes.post("/rooms", roomController.create);
 adminRoutes.patch("/rooms/:id", roomController.update);
 adminRoutes.delete("/rooms/:id", roomController.delete);
 
-adminRoutes.get("/reservation", reservationController.get);
-adminRoutes.get("/reservation/:id", reservationController.getById);
-adminRoutes.post("/reservation", reservationController.create);
-adminRoutes.patch("/reservation/:id");
-adminRoutes.delete("/reservation/:id");
+adminRoutes.get("/reservations", reservationController.get);
+adminRoutes.get("/reservations/:id", reservationController.getById);
+adminRoutes.post("/reservations", reservationController.create);
+adminRoutes.patch("/reservations/:id");
+adminRoutes.delete("/reservations/:id");
 
 adminRoutes.get("/services", serviceController.get);
 adminRoutes.get("/services/:id", serviceController.getById);

@@ -5,6 +5,7 @@ import { userService } from "@services/user.service";
 
 import { authService } from "@services/auth.service";
 import { authValidador } from "@validators/auth.validator";
+import { ExtendedRequest } from "types/extended-request";
 
 const authController: { [keys: string]: RequestHandler } = {
   register: async (req, res) => {
@@ -68,7 +69,10 @@ const authController: { [keys: string]: RequestHandler } = {
     });
   },
 
-  validate: (req, res) => {},
+  validate: (req: ExtendedRequest, res) => {
+    const { id, name, email, role } = req.user!;
+    res.status(200).json({ user: { id, name, email, role } });
+  },
 };
 
 export { authController };

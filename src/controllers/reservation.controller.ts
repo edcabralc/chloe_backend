@@ -110,6 +110,7 @@ const reservationController: { [key: string]: RequestHandler } = {
 
   updateByGuest: async (req: ExtendedRequest, res) => {
     const userId = req.user?.id;
+    const reservationId = req.params.id;
     const validationResult = reservationValidator.updateByUser(req.body);
 
     if (!validationResult.success) {
@@ -123,7 +124,7 @@ const reservationController: { [key: string]: RequestHandler } = {
 
     try {
       const existingReservation = await prisma.reservation.findFirst({
-        where: { userId },
+        where: { userId, id: reservationId },
       });
 
       if (!existingReservation) {
@@ -131,7 +132,7 @@ const reservationController: { [key: string]: RequestHandler } = {
         return;
       }
 
-      if (userId !== existingReservation?.userId) {
+      if (existingReservation?.userId !== userId && existingReservation?.id !== reservationId) {
         res.status(403).json({ error: "Você não tem permissão para atualizar esta reserva." });
         return;
       }
@@ -146,6 +147,7 @@ const reservationController: { [key: string]: RequestHandler } = {
       res.status(200).json(updatedReservation);
     } catch (error) {
       res.status(500).json({ error: "Erro ao atualizar reserva." });
+      console.log(error);
       return;
     }
   },
